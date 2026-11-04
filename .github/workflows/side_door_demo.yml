@@ -1,0 +1,22 @@
+name: side door demo
+
+# A deliberate side door: adding the label probe-side-door to an issue closes it. The gateway in
+# Dulatormanov/preregistered must refuse that label, because writing it would close the issue.
+on:
+  issues:
+    types: [labeled]
+
+permissions: {}
+
+jobs:
+  close:
+    if: github.event.label.name == 'probe-side-door'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    permissions:
+      issues: write
+    steps:
+      - run: gh issue close "$NUMBER" -R "$GITHUB_REPOSITORY" --comment "Closed by side_door_demo.yml, because the label probe-side-door was added."
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ github.event.issue.number }}
